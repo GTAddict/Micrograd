@@ -14,7 +14,7 @@ def graph(value):
                 visited.add(node)
                 uid = str(id(node))
                 opuid = uid + node.operator
-                graph.node(name=uid, label=f"{node.label} | data={node.data}", shape='record')
+                graph.node(name=uid, label=f"{node.label} | data={node.data:.4f} | grad={node.grad:.4f}", shape='record')
                 if node.operator:
                     graph.node(name=opuid, label=f"{node.operator}")
                     graph.edge(opuid, uid)
@@ -26,11 +26,12 @@ def graph(value):
 
 class Value:
 
-    def __init__(self, data, operator='', operands=(), label='rvalue'):
+    def __init__(self, data, operator='', operands=(), label=''):
         self.data = data
+        self.grad = 0.0
         self.operator = operator
         self.operands = set(operands)
-        self.label = label
+        self.label = label or str(data)
 
     def __repr__(self):
         return f"Value(data={self.data}, operator={self.operator}, operands={self.operands})"
@@ -52,12 +53,14 @@ class Value:
 a = Value(2.0, label='a')
 b = Value(-3.0, label='b')
 c = Value(10.0, label='c')
-d = (a * (b + c) + Value(10)) - Value(24)
+e = a * b
+e.label = 'e'
+d = e + c
 d.label = 'd'
-print (d)
-graph = graph(d)
+f = Value(-2.0, label='f')
+L = d * f
+L.label = 'L'
+graph = graph(L)
 graph.view()
-                    
 
-                    
 
