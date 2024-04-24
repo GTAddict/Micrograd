@@ -12,7 +12,7 @@ class Value:
         self.label = label or str(data)
 
     def __repr__(self):
-        return f"Value(data={self.data}, operator={self.operator}, operands={self.operands})"
+        return f"Value(data={self.data})"
     
     def __add__(self, other):
         other = other if isinstance(other, Value) else Value(other)
@@ -124,42 +124,3 @@ def graph(value):
                 graph.edge(str(id(operand)), opuid)
 
     return graph
-
-# Tests, should be moved into their own file
-x1 = Value(2.0, label='x1')
-x2 = Value(0.0, label='x2')
-
-w1 = Value(-3.0, label='w1')
-w2 = Value(1.0, label='w2')
-
-b = Value(6.881335870195432, label='b')
-n = x1*w1 + x2*w2 + b
-n.label = 'n'
-e = (2 * n).exp()
-o = (e - 1)/(e + 1)
-o.backward()
-graph(o).view()
-
-o = (x1 * w1) * (x1 + w1)
-o.backward()
-graph(o).view()
-
-a = Value(3.0, label='a')
-b = a + a
-b.backward()
-graph(b).view()
-
-a = Value(-2.0, label='a')
-b = Value(3.0, label='b')
-d = a * b
-e = a + b
-f = d * e
-f.backward()
-graph(f).view()
-
-a = Value(2.0, label='a')
-b = Value(4.0, label='b')
-c = a / b
-c.label = 'c'
-c.backward()
-graph(c).view()
