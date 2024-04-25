@@ -1,4 +1,3 @@
-import numpy as np
 import random
 from grad import Value, graph
 
@@ -13,6 +12,9 @@ class Neuron:
         act = y.tanh()
         return act
     
+    def parameters(self):
+        return self.w + [self.b]
+    
 class Layer:
 
     def __init__(self, nin, nout):
@@ -20,6 +22,9 @@ class Layer:
 
     def __call__(self, x):
         return [ neuron(x) for neuron in self.neurons ]
+    
+    def parameters(self):
+        return [ p for neuron in self.neurons for p in neuron.parameters() ]
     
 class MLP:
 
@@ -30,10 +35,29 @@ class MLP:
     def __call__(self, x):
         for layer in self.layers:
             x = layer(x)
-        return x if len(x) != 1 else x[0] 
+        return x if len(x) != 1 else x[0]
     
-x = [2.0, 3.0, -1.0]
-n = MLP(3, [4, 4, 1])
-o = n(x)
-o.backward()
-graph(o).view()
+    def parameters(self):
+        return [ p for layer in self.layers for p in layer.parameters() ]
+
+n = MLP(3, [4, 4, 1])    
+
+xs = [
+    [2.0, 3.0, -1.0],
+    [3.0, -1.0, 0.5],
+    [0.5, 1.0, 1.0],
+    [1.0, 1.0, -1.0]
+]
+ys = [1.0, -1.0 -1.0, 1.0]
+
+step = 0.001
+
+for i in range(1000):
+    ypreds = [n(x) for x in xs]
+    loss = sum((yout - ygt)**2 for yout, ygt in zip (ypreds, ys))
+    print(loss)
+    loss.backward()
+
+    for p in n.parameters():
+        p.data -= step * p.grad
+        p.grad = 0.0
