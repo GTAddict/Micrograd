@@ -1,5 +1,5 @@
 import random
-from grad import Value, graph
+from grad import Value
 
 class Neuron:
 
@@ -39,25 +39,3 @@ class MLP:
     
     def parameters(self):
         return [ p for layer in self.layers for p in layer.parameters() ]
-
-n = MLP(3, [4, 4, 1])    
-
-xs = [
-    [2.0, 3.0, -1.0],
-    [3.0, -1.0, 0.5],
-    [0.5, 1.0, 1.0],
-    [1.0, 1.0, -1.0]
-]
-ys = [1.0, -1.0 -1.0, 1.0]
-
-step = 0.001
-
-for i in range(1000):
-    ypreds = [n(x) for x in xs]
-    loss = sum((yout - ygt)**2 for yout, ygt in zip (ypreds, ys))
-    print(loss)
-    loss.backward()
-
-    for p in n.parameters():
-        p.data -= step * p.grad
-        p.grad = 0.0
