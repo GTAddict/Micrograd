@@ -1,5 +1,5 @@
 import random
-from grad import Value
+from value import Value
 
 class Neuron:
 

@@ -1,5 +1,4 @@
-import numpy as np
-from graphviz import Digraph
+import math
 
 class Value:
 
@@ -47,7 +46,7 @@ class Value:
         return out
     
     def exp(self):
-        out = Value(np.exp(self.data), 'exp', (self,), f"e^({self.label})")
+        out = Value(math.exp(self.data), 'exp', (self,), f"e^({self.label})")
 
         def _backward():
             self.grad += out.grad * out.data 
@@ -56,7 +55,7 @@ class Value:
         return out
     
     def tanh(self):
-        out = Value(np.tanh(self.data), 'tanh', (self,), f"tanh({self.label})")
+        out = Value(math.tanh(self.data), 'tanh', (self,), f"tanh({self.label})")
 
         def _backward():
             self.grad += out.grad * (1 - out.data ** 2)
@@ -101,26 +100,3 @@ class Value:
         self.grad = 1.0
         for node in reversed(_topo):
             node._backward()
-            
-        
-def graph(value):
-    open = set()
-    open.add(value)
-    visited = set()
-    graph = Digraph(format='svg', graph_attr={'rankdir' : 'LR'})
-
-    while len(open):
-        node = open.pop()
-        if node not in visited:
-            visited.add(node)
-            uid = str(id(node))
-            opuid = uid + node.operator
-            graph.node(name=uid, label=f"{node.label} | data={node.data:.4f} | grad={node.grad:.4f}", shape='record')
-            if node.operator:
-                graph.node(name=opuid, label=f"{node.operator}")
-                graph.edge(opuid, uid)
-            for operand in node.operands:
-                open.add(operand)
-                graph.edge(str(id(operand)), opuid)
-
-    return graph
